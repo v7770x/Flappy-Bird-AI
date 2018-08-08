@@ -18,7 +18,8 @@ public class Column : MonoBehaviour {
     {
         if (other.GetComponent<Bird>() != null)
         {
-            GameController.instance.BirdScored();
+            Bird bird = other.gameObject.GetComponent<Bird>();
+            bird.score_big();
         }
     }
 }
