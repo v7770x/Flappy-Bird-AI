@@ -16,13 +16,14 @@ public class Bird : MonoBehaviour {
     public int id;
 
     //keep tract of score
-    public float score = 0;
+    public float score = 0, start_time;
 
 	// Use this for initialization
 	void Start () {
         rb2d = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         cp = GameObject.FindObjectOfType<ColumnPool>();
+        start_time = Time.time;
 	}
 
     private void FixedUpdate()
@@ -42,7 +43,7 @@ public class Bird : MonoBehaviour {
         Vector2 currPos = transform.position;
         Matrix inputs = cp.getInputs(currPos.x, currPos.y);
         float output = (float)forwardProp(inputs)[1,1].Re;
-        Debug.Log(output);
+        //Debug.Log(id+"  "+output);
         if (output > 0.5)
         {
             flap();
@@ -59,28 +60,32 @@ public class Bird : MonoBehaviour {
 
     Matrix forwardProp(Matrix inputs)
     {
-        applyActivationFunction(ref inputs);
+        //inputs = applyActivationFunction(inputs);
 
         inputs.InsertRow(Matrix.Identity(1), 1);
         Matrix hiddenLayer1 = (th1 * inputs);
-        applyActivationFunction(ref hiddenLayer1);
+        //Debug.Log((th1.RowCount + "   " + th1.ColumnCount));
+        //Debug.Log((inputs.RowCount + "   " + inputs.ColumnCount));
+        hiddenLayer1 = applyActivationFunction(hiddenLayer1);
 
         hiddenLayer1.InsertRow(Matrix.Identity(1), 1);
         Matrix output = th2 * hiddenLayer1;
-        applyActivationFunction(ref output);
+        output = applyActivationFunction(output);
 
         return output;
     }
 
-    void applyActivationFunction(ref Matrix m)
+    Matrix applyActivationFunction(Matrix m)
     {
+        Matrix activated_m = new Matrix(m.RowCount, m.ColumnCount);
         for(int i=1; i<= m.RowCount; i++)
         {
             for(int j=1; j<= m.ColumnCount; j++)
             {
-                m[i, j] = new Complex(sigmoid(m[i, j].Re));
+                activated_m[i, j] = new Complex(sigmoid(m[i, j].Re));
             }
         }
+        return activated_m;
     }
 
     double sigmoid(double val)
@@ -96,12 +101,12 @@ public class Bird : MonoBehaviour {
             rb2d.velocity = Vector2.zero;
             is_dead = true;
             anim.SetTrigger("Die");
-            GameController.instance.BirdDied(id, score +Time.time);
+            GameController.instance.BirdDied(id, score +Time.time - start_time);
             Destroy(gameObject);
         }
         else
         {
-            Physics2D.IgnoreCollision(other.gameObject.GetComponent<Collider2D>(), GetComponent<Collider2D>());
+            Physics2D.IgnoreCollision(other.gameObject.GetComponent<PolygonCollider2D>(), GetComponent<PolygonCollider2D>());
         }
         
     }

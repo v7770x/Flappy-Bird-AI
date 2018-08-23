@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 60672978821315874}
   - component: {fileID: 114435359961096656}
   - component: {fileID: 95867113148219772}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Bird
   m_TagString: Bird
   m_Icon: {fileID: 0}
@@ -133,7 +133,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   up_force: 200
+  cp: {fileID: 0}
   id: 0
+  score: 0
 --- !u!212 &212692111349814536
 SpriteRenderer:
   m_ObjectHideFlags: 1
